@@ -710,6 +710,30 @@ async def cb_stop_scan(callback: types.CallbackQuery):
     is_scanning = False
     await callback.message.answer("⏹ **Đã gửi lệnh dừng.**", parse_mode="Markdown")
 
+@dp.message(Command("view"))
+async def cmd_view_accounts(message: types.Message):
+    if not os.path.exists("100.txt"):
+        return await message.answer("⚠️ File `100.txt` hiện chưa được tạo!", parse_mode="Markdown")
+    
+    with open("100.txt", "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    
+    total = len(lines)
+    if total == 0:
+        return await message.answer("⚠️ File `100.txt` đang trống!")
+    
+    # Lấy 10 dòng đầu và 5 dòng cuối để xem mẫu
+    sample_head = "".join(lines[:10])
+    sample_tail = "".join(lines[-5:]) if total > 10 else ""
+    
+    msg = f"📄 **THÔNG TIN FILE 100.TXT**\n"
+    msg += f"📊 Tổng số tài khoản: `{total:,}`\n\n"
+    msg += f"🔹 **10 dòng đầu:**\n```\n{sample_head}```\n"
+    if sample_tail:
+        msg += f"🔹 **5 dòng cuối:**\n```\n{sample_tail}```"
+        
+    await message.answer(msg, parse_mode="Markdown")
+
 async def main():
     log_safe("🤖 Bot sẵn sàng hoạt động trên Railway...", Col.GOLD)
     await dp.start_polling(telegram_bot)
